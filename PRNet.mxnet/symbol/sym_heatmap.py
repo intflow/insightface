@@ -277,22 +277,22 @@ def hourglass(data, nFilters, nModules, n, workspace, name, binarize, dcn):
   s = 2
   _dcn = False
   up1 = data
-  for i in xrange(nModules):
+  for i in range(nModules):
     up1 = conv_block(up1, nFilters, (1,1), True, "%s_up1_%d"%(name,i), binarize, _dcn, 1)
   low1 = mx.sym.Pooling(data=data, kernel=(s, s), stride=(s,s), pad=(0,0), pool_type='max')
   #low1 = ConvFactory(data, nFilters, (4,4), stride=(2,2), pad=(1,1), name=name+'_conv')
   #low1 = ConvFactory(data, nFilters, (3,3), stride=(2,2), pad=(1,1), name=name+'_conv')
   #low1 = ConvFactory(up1, nFilters, (3,3), stride=(2,2), pad=(1,1), name=name+'_conv')
-  for i in xrange(nModules):
+  for i in range(nModules):
     low1 = conv_block(low1, nFilters, (1,1), True, "%s_low1_%d"%(name,i), binarize, _dcn, 1)
   if n>1:
     low2 = hourglass(low1, nFilters, nModules, n-1, workspace, "%s_%d"%(name, n-1), binarize, dcn)
   else:
     low2 = low1
-    for i in xrange(nModules):
+    for i in range(nModules):
       low2 = conv_block(low2, nFilters, (1,1), True, "%s_low2_%d"%(name,i), binarize, _dcn, 1) #TODO
   low3 = low2
-  for i in xrange(nModules):
+  for i in range(nModules):
     low3 = conv_block(low3, nFilters, (1,1), True, "%s_low3_%d"%(name,i), binarize, _dcn, 1)
   up2 = mx.symbol.UpSampling(low3, scale=s, sample_type='nearest', workspace=512, name='%s_upsampling_%s'%(name,n), num_args=1)
   #up2 = mx.symbol.UpSampling(low3, scale=s, sample_type='bilinear', num_filter=nFilters, workspace=512, name='%s_upsampling_%s'%(name,n), num_args=1)
@@ -383,7 +383,7 @@ def get_symbol(num_classes):
     outs = []
 
     body = hourglass(body, nFilters, nModules, config.net_n, workspace, 'stack0_hg', binarize, dcn)
-    for j in xrange(nModules):
+    for j in range(nModules):
       body = conv_block(body, nFilters, (1,1), True, 'stack0_unit%d'%(j), binarize, dcn, 1)
     _dcn = False
     ll = ConvFactory(body, nFilters, (1,1), dcn = _dcn, name='stack0_ll')

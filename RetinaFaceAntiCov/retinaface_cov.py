@@ -239,7 +239,7 @@ class RetinaFaceCoV:
               #print('getting', im_scale, stride, idx, len(net_out), data.shape, file=sys.stderr)
               scores = net_out[sym_idx].asnumpy()
               type_scores = net_out[sym_idx+3].asnumpy()
-              print(scores.shape, type_scores.shape)
+              # print('scores.shape, type_scores.shape: ', scores.shape, type_scores.shape)
               if self.debug:
                 timeb = datetime.datetime.now()
                 diff = timeb - timea

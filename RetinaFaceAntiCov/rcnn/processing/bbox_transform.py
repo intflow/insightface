@@ -1,7 +1,6 @@
 import numpy as np
-from ..cython.bbox import bbox_overlaps_cython
+from rcnn.cython.bbox import bbox_overlaps_cython
 #from rcnn.config import config
-
 
 def bbox_overlaps(boxes, query_boxes):
     return bbox_overlaps_cython(boxes, query_boxes)

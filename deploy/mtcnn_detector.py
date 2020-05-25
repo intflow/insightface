@@ -7,7 +7,7 @@ import cv2
 from multiprocessing import Pool
 from itertools import repeat
 try:
-    from itertools import izip
+    from itertools import zip
 except ImportError:
     izip = zip
 
