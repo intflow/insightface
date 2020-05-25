@@ -1,7 +1,9 @@
 
 # InsightFace: 2D and 3D Face Analysis Project
+originated By Jia Guo and [Jiankang Deng](https://jiankangdeng.github.io/)
 
-By Jia Guo and [Jiankang Deng](https://jiankangdeng.github.io/)
+## Notice
+This code is edited by IntFlow, CO., Ltd.
 
 ## License
 
