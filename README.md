@@ -1,6 +1,8 @@
 
 # InsightFace: 2D and 3D Face Analysis Project
+
 originated By Jia Guo and [Jiankang Deng](https://jiankangdeng.github.io/)
+
 ---
 
 # IntFlow Workspace
