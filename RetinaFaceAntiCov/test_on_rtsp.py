@@ -35,20 +35,20 @@ if __name__ == '__main__':
     ## Parse arguments
     parser = argparse.ArgumentParser(description="argparser for mask_face_detection.")
 
-    parser.add_argument("-S", "--source", default="rtsp://admin:kmjeon3121@192.168.0.108:554/cam/realmonitor?channel=1&subtype=0", type=str, help="Path to the rtsp address of webcam or the path of the video.")
+    parser.add_argument("-S", "--source", default="rtsp://admin:kmjeon3121@192.168.0.108:554/cam/realmonitor?channel=1&subtype=1", type=str, help="Path to the rtsp address of webcam or the path of the video.")
     parser.add_argument("-MP", "--model_path", default="./model/mnet_cov2")
     parser.add_argument("-TH", "--threshold", default=0.8, type=float, help="")
     parser.add_argument("-MTH", "--mask_thresh", default=0.2, type=float, help="")
     parser.add_argument("--epoch", default=0, type=int, help="model's epoch.")
     parser.add_argument("--gpu_id", default=0, type=int, help="GPU ID.")
-    parser.add_argument("--frame_width", default=640, type=int, help="resize width.")
-    parser.add_argument("--frame_height", default=480, type=int, help="resize width.")
+    parser.add_argument("--frame_width", default=480, type=int, help="resize width.")
+    parser.add_argument("--frame_height", default=270, type=int, help="resize width.")
     parser.add_argument("--frame_flip", default=False, type=str2bool, help="Flip frame or not.")
     args = vars(parser.parse_args())
 
     ## Default variables
     target_size = 480 #640
-    max_size = 640 #1080
+    max_size = 480 #1080
     count = 1
 
     ## Load model 
@@ -98,13 +98,13 @@ if __name__ == '__main__':
                     color = (255,0,0)
                     cv2.circle(frame, (landmark5[l][0], landmark5[l][1]), 1, color, 5)
 
-        
-        cv2.imshow("RTSP frame", frame)
+        dispaly_frame = imutils.resize(frame.copy(), width=480, height=270)
+        cv2.imshow("RTSP frame", dispaly_frame)
 
         # Press 'q' to terminate cv2.imshow()
         if (cv2.waitKey(1) & 0xFF == ord('q')):
             break
-    vs.release()
+
     cv2.destroyAllWindows()
 
         
