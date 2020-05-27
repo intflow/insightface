@@ -3,7 +3,7 @@ datasets/
 models/
 RetinaFaceAntiCov/model/
 RetinaFace/model/
-face_verify/model/
+face_identification/model/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
