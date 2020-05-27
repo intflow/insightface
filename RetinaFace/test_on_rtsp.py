@@ -1,30 +1,27 @@
 """
 *Initial writer : GBKim
-*Date           : Mon.25.May.2020
+*Date           : Mon.26.May.2020
 *Description    :
-    - It contains the code for Mask_face detection trough rtsp.
+    - It contains the code for Face Feature (5points) extractor and Face   
+        detector on rtsp frame.
     - You need to check parsed arguments.
 *logs           :
     - GBKim 05.25.2020: Initial coding.
 """
-
+## Import Packages
 import cv2
 import sys
-import numpy as np
-import datetime
-import os
-import glob
-import time
 import argparse
 import imutils
+import time
+import numpy as np
 from imutils.video import VideoStream
-from imutils.video import WebcamVideoStream
 from imutils.video import FPS
-from retinaface_cov import RetinaFaceCoV
+from retinaface import RetinaFace
 
 def str2bool(v):
     if isinstance(v, bool):
-       return v
+        return v
     if v.lower() in ('yes', 'true', 't', 'y', '1'):
         return True
     elif v.lower() in ('no', 'false', 'f', 'n', '0'):
@@ -32,29 +29,31 @@ def str2bool(v):
     else:
         raise argparse.ArgumentTypeError('Boolean value expected.')
 
+
 if __name__ == '__main__':
     ## Parse arguments
     parser = argparse.ArgumentParser(description="argparser for mask_face_detection.")
 
     parser.add_argument("-S", "--source", default="rtsp://admin:kmjeon3121@192.168.0.108:554/cam/realmonitor?channel=1&subtype=0", type=str, help="Path to the rtsp address of webcam or the path of the video.")
-    parser.add_argument("-MP", "--model_path", default="./model/mnet_cov2")
+    parser.add_argument("-MP", "--model_path", default="./model/retinaface-R50/R50")
     parser.add_argument("-TH", "--threshold", default=0.8, type=float, help="")
-    parser.add_argument("-MTH", "--mask_thresh", default=0.2, type=float, help="")
     parser.add_argument("--epoch", default=0, type=int, help="model's epoch.")
     parser.add_argument("--gpu_id", default=0, type=int, help="GPU ID.")
     parser.add_argument("--frame_width", default=480, type=int, help="resize width.")
     parser.add_argument("--frame_height", default=270, type=int, help="resize width.")
     parser.add_argument("--frame_flip", default=False, type=str2bool, help="Flip frame or not.")
+    parser.add_argument("--circle_size", default=2, type=int, help="size of circle radius for landmarks on the face")
     args = vars(parser.parse_args())
 
+
     ## Default variables
-    scales = [270, 480] # [640, 960]
-    target_size = scales[0] #640
-    max_size = scales[1] #1080
-    count = 2
+    scales = [270, 480] #[1024, 1980]
+    count = 1
+    target_size = scales[0]
+    max_size = scales[1]
 
     ## Load model 
-    detector = RetinaFaceCoV(prefix=args['model_path'], epoch=args['epoch'], ctx_id=args['gpu_id'], network='net3l')
+    detector = RetinaFace(prefix=args['model_path'], epoch=args['epoch'], ctx_id=args['gpu_id'], network='net3')
 
     ## Capture RTSP video
     vs = VideoStream(src=args['source']).start()
@@ -88,21 +87,18 @@ if __name__ == '__main__':
             print(f"Find, {faces.shape[0]} faces.")
 
             for i in range(faces.shape[0]):
-                face = faces[i]
-                box = face[0:4].astype(np.int)
-                mask = face[5]
-                print(i, box, mask)
+                box = faces[i].astype(np.int)
+                print(f"[INFO] Information {i+1}-th face box: {box}")
+                color = (0,0,255)
 
-                if mask >= args["mask_thresh"]:
-                    color = (0,0,255)
-                else:
-                    color = (0,255,0)
                 cv2.rectangle(frame, (box[0], box[1]), (box[2], box[3]), color, 5)
-                landmark5 = landmarks[i].astype(np.int)
+
+                if landmarks is not None:
+                    landmark5 = landmarks[i].astype(np.int)
 
                 for l in range(landmark5.shape[0]):
                     color = (255,0,0)
-                    cv2.circle(frame, (landmark5[l][0], landmark5[l][1]), 1, color, 5)
+                    cv2.circle(frame, (landmark5[l][0], landmark5[l][1]), args["circle_size"], color, 5)
 
         # check frame
         sec = curTime - prevTime
@@ -110,13 +106,11 @@ if __name__ == '__main__':
         fps = 1 / sec
         fps_str_format = "FPS: {%.2f}" % fps 
         print("[INFO] approx. current FPS: {:.2f}".format(fps))
-        cv2.putText(frame, fps_str_format, (0, 100), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 4)
+        cv2.putText(frame, fps_str_format, (0, 150), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 4)
 
         dispaly_frame = imutils.resize(frame.copy(), width=480, height=270)
         cv2.imshow("RTSP frame", dispaly_frame)
-
-
-
+        
         # Press 'q' to terminate cv2.imshow()
         if (cv2.waitKey(1) & 0xFF == ord('q')):
             break

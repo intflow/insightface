@@ -12,9 +12,9 @@ scales = [1024, 1980]
 count = 1
 
 gpuid = 0
-detector = RetinaFace('./model/R50', 0, gpuid, 'net3')
+detector = RetinaFace('./model/retinaface-R50/R50', 0, gpuid, 'net3')
 
-img = cv2.imread('t1.jpg')
+img = cv2.imread('/home/gbkim/gb_dev/insightface_MXNet/insightface/RetinaFace/GB_test_img/no_mask_face.jpg')
 print(img.shape)
 im_shape = img.shape
 target_size = scales[0]
