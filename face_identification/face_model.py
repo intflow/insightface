@@ -17,8 +17,8 @@ from time import sleep
 from easydict import EasyDict as edict
 from mtcnn_detector import MtcnnDetector
 sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'src', 'common'))
-import face_image
-import face_preprocess
+from utils import face_image
+from utils import face_preprocess
 
 
 def do_flip(data):

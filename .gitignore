@@ -4,6 +4,7 @@ models/
 RetinaFaceAntiCov/model/
 RetinaFace/model/
 face_identification/model/
+face_identification/mtcnn-model
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

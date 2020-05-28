@@ -16,7 +16,7 @@ parser.add_argument('--threshold', default=1.24, type=float, help='ver dist thre
 args = parser.parse_args()
 
 model = face_model.FaceModel(args)
-img = cv2.imread('Tom_Hanks_54745.png')
+img = cv2.imread('/home/gbkim/gb_dev/insightface_MXNet/insightface/deploy/Tom_Hanks_54745.png')
 img = model.get_input(img)
 f1 = model.get_feature(img)
 #print(f1[0:10])

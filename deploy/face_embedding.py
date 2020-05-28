@@ -6,7 +6,7 @@ from scipy import misc
 import sys
 import os
 import argparse
-import tensorflow as tf
+# import tensorflow as tf
 import numpy as np
 import mxnet as mx
 import random
@@ -18,7 +18,7 @@ from easydict import EasyDict as edict
 from mtcnn_detector import MtcnnDetector
 sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'src', 'common'))
 import face_image
-import face_preprocess
+import face_preprocess 
 
 
 def do_flip(data):

@@ -26,8 +26,6 @@ def parse_lst_line(line):
   return image_path, label, bbox, landmark, aligned
 
 
-
-
 def read_image(img_path, **kwargs):
   mode = kwargs.get('mode', 'rgb')
   layout = kwargs.get('layout', 'HWC')
@@ -95,21 +93,8 @@ def preprocess(img, bbox=None, landmark=None, **kwargs):
   else: #do align using landmark
     assert len(image_size)==2
 
-    #src = src[0:3,:]
-    #dst = dst[0:3,:]
-
-
-    #print(src.shape, dst.shape)
-    #print(src)
-    #print(dst)
-    #print(M)
-
-    
     warped = cv2.warpAffine(img,M,(image_size[1],image_size[0]), borderValue = 0.0)
 
-    #tform3 = trans.ProjectiveTransform()
-    #tform3.estimate(src, dst)
-    #warped = trans.warp(img, tform3, output_shape=_shape)
     return warped
 
 

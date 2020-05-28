@@ -66,13 +66,13 @@ def main(args):
         curTime = time.time() # For FPS
 
         for c in range(count):
-            faces, landmarks = detector.detect(frame, args["threshold"], scales=scales, do_flip=flip)
+            face_bbox, landmarks = detector.detect(frame, args["threshold"], scales=scales, do_flip=flip)
 
-        if faces is not None:
-            print(f"Find, {faces.shape[0]} faces.")
+        if face_bbox is not None:
+            print(f"Find, {face_bbox.shape[0]} face_bbox.")
 
-            for i in range(faces.shape[0]):
-                box = faces[i].astype(np.int)
+            for i in range(face_bbox.shape[0]):
+                box = face_bbox[i].astype(np.int)
                 print(f"[INFO] Information {i+1}-th face box: {box}")
                 color = (0,0,255)
 
@@ -81,6 +81,7 @@ def main(args):
                 if landmarks is not None:
                     landmark5 = landmarks[i].astype(np.int)
                     print(f"[INFO] Information {i+1}-th face landmarks: {landmark5}")
+                    import pdb; pdb.set_trace()
 
                 for l in range(landmark5.shape[0]):
                     color = (255,0,0)
@@ -110,7 +111,7 @@ if __name__ == '__main__':
 
     parser.add_argument("-S", "--source", default="rtsp://admin:kmjeon3121@192.168.0.108:554/cam/realmonitor?channel=1&subtype=0", type=str, help="Path to the rtsp address of webcam or the path of the video.")
     parser.add_argument("-MP", "--model_path", default="./model/retinaface-R50/R50", type=str, help="Path of the model.")
-    parser.add_argument("-TH", "--threshold", default=0.8, type=float, help="")
+    parser.add_argument("-TH", "--threshold", default=0.8, type=float, help="detection threshold")
     parser.add_argument("--epoch", default=0, type=int, help="model's epoch.")
     parser.add_argument("--gpu_id", default=0, type=int, help="GPU ID.")
     parser.add_argument("--frame_width", default=480, type=int, help="resize width.")
