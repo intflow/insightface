@@ -11,7 +11,10 @@ originated By Jia Guo and [Jiankang Deng](https://jiankangdeng.github.io/)
 This code is edited by IntFlow, Co., Ltd.
 
 ## What is done now
-1. 마스크 착용 여부 체크 모델의 RTSP Frame Detection 완료.
+1. \[완료\]마스크 착용 여부 체크 모델의 RTSP Frame Detection
+2. \[완료\]RetinaFace 모델을 활용한 Face Detection
+3. \[완료\]RetinaFace 모델을 활용한 두 이미지의 상관도 분석
+4. \[예정\]Identification 코드 작성
 
 
 ## License
