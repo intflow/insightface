@@ -30,22 +30,7 @@ def str2bool(v):
         raise argparse.ArgumentTypeError('Boolean value expected.')
 
 
-if __name__ == '__main__':
-    ## Parse arguments
-    parser = argparse.ArgumentParser(description="argparser for mask_face_detection.")
-
-    parser.add_argument("-S", "--source", default="rtsp://admin:kmjeon3121@192.168.0.108:554/cam/realmonitor?channel=1&subtype=0", type=str, help="Path to the rtsp address of webcam or the path of the video.")
-    parser.add_argument("-MP", "--model_path", default="./model/retinaface-R50/R50")
-    parser.add_argument("-TH", "--threshold", default=0.8, type=float, help="")
-    parser.add_argument("--epoch", default=0, type=int, help="model's epoch.")
-    parser.add_argument("--gpu_id", default=0, type=int, help="GPU ID.")
-    parser.add_argument("--frame_width", default=480, type=int, help="resize width.")
-    parser.add_argument("--frame_height", default=270, type=int, help="resize width.")
-    parser.add_argument("--frame_flip", default=False, type=str2bool, help="Flip frame or not.")
-    parser.add_argument("--circle_size", default=2, type=int, help="size of circle radius for landmarks on the face")
-    args = vars(parser.parse_args())
-
-
+def main(args):
     ## Default variables
     scales = [270, 480] #[1024, 1980]
     count = 1
@@ -95,6 +80,7 @@ if __name__ == '__main__':
 
                 if landmarks is not None:
                     landmark5 = landmarks[i].astype(np.int)
+                    print(f"[INFO] Information {i+1}-th face landmarks: {landmark5}")
 
                 for l in range(landmark5.shape[0]):
                     color = (255,0,0)
@@ -117,12 +103,21 @@ if __name__ == '__main__':
 
     cv2.destroyAllWindows()
 
-        
 
-        
+if __name__ == '__main__':
+    ## Parse arguments
+    parser = argparse.ArgumentParser(description="argparser for mask_face_detection.")
 
+    parser.add_argument("-S", "--source", default="rtsp://admin:kmjeon3121@192.168.0.108:554/cam/realmonitor?channel=1&subtype=0", type=str, help="Path to the rtsp address of webcam or the path of the video.")
+    parser.add_argument("-MP", "--model_path", default="./model/retinaface-R50/R50", type=str, help="Path of the model.")
+    parser.add_argument("-TH", "--threshold", default=0.8, type=float, help="")
+    parser.add_argument("--epoch", default=0, type=int, help="model's epoch.")
+    parser.add_argument("--gpu_id", default=0, type=int, help="GPU ID.")
+    parser.add_argument("--frame_width", default=480, type=int, help="resize width.")
+    parser.add_argument("--frame_height", default=270, type=int, help="resize width.")
+    parser.add_argument("--frame_flip", default=False, type=str2bool, help="Flip frame or not.")
+    parser.add_argument("--circle_size", default=2, type=int, help="size of circle radius for landmarks on the face")
+    args = vars(parser.parse_args())
 
-
-
-
+    main(args)
 
