@@ -88,6 +88,10 @@ class FaceModel:
     input_blob = np.expand_dims(aligned, axis=0)
     data = mx.nd.array(input_blob)
     db = mx.io.DataBatch(data=(data,))
+
+    print(db.data[0].shape)
+    import pdb; pdb.set_trace()
+
     self.model.forward(db, is_train=False)
     embedding = self.model.get_outputs()[0].asnumpy()
     embedding = sklearn.preprocessing.normalize(embedding).flatten()

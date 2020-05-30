@@ -11,7 +11,7 @@ import face_model
 
 parser = argparse.ArgumentParser(description='face model test')
 # general
-parser.add_argument('--image-size', default='112,112', help='')
+parser.add_argument('--image-size', default='112,112', help='') 
 parser.add_argument('--model', default='/home/gbkim/gb_dev/insightface_MXNet/insightface/face_identification/model/LResNet50E-I_model-r50-am-lfw/model, 0', help='path to load model.')
 parser.add_argument('--ga-model', default='', help='path to load model.')
 parser.add_argument('--gpu', default=0, type=int, help='gpu id')

@@ -15,7 +15,6 @@ sys.path.append(os.path.dirname(os.path.abspath(os.path.dirname(__file__))))
 import cv2
 import numpy as np
 import argparse
-import numpy as np
 import matplotlib.pyplot as plt
 from utils.get_face_embedding import AnalyzeFace
 
@@ -76,12 +75,12 @@ if __name__ == "__main__":
     parser.add_argument('--embedding_epoch', default=0, type=int, help='epoch of the embedding model.')
     parser.add_argument('--det_threshold', default=0.8, type=float, help="detection threshold.")
     parser.add_argument('--frame_flip', default=False, type=str2bool, help='Flip frame or not.')
-    parser.add_argument('--resize_width', default=480, type=int, help='resize width.')
-    parser.add_argument('--resize_height', default=270, type=int, help='resize height.')
+    parser.add_argument('--resize_width', default=112, type=int, help='resize width.')
+    parser.add_argument('--resize_height', default=112, type=int, help='resize height.')
     args = vars(parser.parse_args())
 
     #adjustable variables
-    scale_candidate = [270, 480]
+    scale_candidate = [112, 128]
 
     #Do detection and embedding comparison.
     main(args, scale_candidate)

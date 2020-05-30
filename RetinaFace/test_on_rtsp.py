@@ -81,7 +81,6 @@ def main(args):
                 if landmarks is not None:
                     landmark5 = landmarks[i].astype(np.int)
                     print(f"[INFO] Information {i+1}-th face landmarks: {landmark5}")
-                    import pdb; pdb.set_trace()
 
                 for l in range(landmark5.shape[0]):
                     color = (255,0,0)
@@ -110,7 +109,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description="argparser for mask_face_detection.")
 
     parser.add_argument("-S", "--source", default="rtsp://admin:kmjeon3121@192.168.0.108:554/cam/realmonitor?channel=1&subtype=0", type=str, help="Path to the rtsp address of webcam or the path of the video.")
-    parser.add_argument("-MP", "--model_path", default="./model/retinaface-R50/R50", type=str, help="Path of the model.")
+    parser.add_argument("-MP", "--model_path", default="/home/gbkim/gb_dev/insightface_MXNet/insightface/RetinaFace/model/retinaface-R50/R50", type=str, help="Path of the model.")
     parser.add_argument("-TH", "--threshold", default=0.8, type=float, help="detection threshold")
     parser.add_argument("--epoch", default=0, type=int, help="model's epoch.")
     parser.add_argument("--gpu_id", default=0, type=int, help="GPU ID.")
