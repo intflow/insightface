@@ -13,8 +13,8 @@ sys.path.append(os.path.abspath(os.path.dirname(__file__)))
 sys.path.append(os.path.dirname(os.path.abspath(os.path.dirname(__file__))))
 
 import cv2
-import numpy as np
 import argparse
+import numpy as np
 import matplotlib.pyplot as plt
 from utils.get_face_embedding import AnalyzeFace
 
