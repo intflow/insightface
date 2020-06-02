@@ -127,8 +127,8 @@ def main(args):
                 train_acc += train_preds.eq(y).float().mean().cpu().numpy()
 
                 ## delete some variables for memory issue
-                # del loss
-                # del model_output
+                del loss
+                del model_output
 
             ## Print training and validation summary
             with torch.no_grad():
@@ -194,7 +194,7 @@ def main(args):
 
 if __name__ == "__main__":
     ap = argparse.ArgumentParser()
-    ap.add_argument("--input_embedding_path", default='/home/gbkim/gb_dev/insightface_MXNet/insightface/face_identification/face_bank/embeddings_info2.pickle')
+    ap.add_argument("--input_embedding_path", default='/home/gbkim/gb_dev/insightface_MXNet/insightface/face_identification/face_bank/embeddings_info_MobileFaceNet_model-y1-test2.pickle')
     ap.add_argument("--epochs", default=50, type=int, help="Epochs for training.")
     ap.add_argument("--batch_size", default=4, type=int, help="Batch size for model training.")
     ap.add_argument('--model_save_path', default="/home/gbkim/gb_dev/insightface_MXNet/insightface/face_identification/model/embedding_classifier/pytorch_embedding_classifier/embedding_classifier.pth", help="path of the model to be saved.")

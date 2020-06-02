@@ -251,7 +251,7 @@ def main(args, scale_candidate):
 
                 cv2.rectangle(frame, (startX, startY), (endX, endY), (0,255,0), 5)
                 # cv2.putText(frame, text, (startX, startY - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0,255,0), 2)
-                cv2.putText(frame, text, (box[0], y_pos), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0,255,0), 2)
+                cv2.putText(frame, text, (box[0], y_pos), cv2.FONT_HERSHE'Y_SIMPLEX, 0.5, (0,255,0), 2)
                 print(f"[INFO] current person: {text}")
 
         disp_frame = imutils.resize(frame, width=480)

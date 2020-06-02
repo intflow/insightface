@@ -20,7 +20,7 @@ from utils import face_preprocess
 from imutils.video import VideoStream
 from architecture.retinaface import RetinaFace
 from utils.face_detection_and_align import AnalyzeFace
-from architecture.embedding_learner_pytorch import embedding_classifier
+from architecture.embedding_learner_pytorch_cpu import embedding_classifier
 
 
 def str2bool(v):
@@ -92,7 +92,10 @@ def load_embedding_model(model_str, epoch, ctx, image_size_for_align, layer):
     all_layers = sym.get_internals()
     sym = all_layers[layer + '_output']
 
-    model = mx.mod.Module(symbol=sym, context=mx.gpu(ctx), label_names=None)
+    if isinstance(ctx, int) and ctx>=0:
+        model = mx.mod.Module(symbol=sym, context=mx.gpu(ctx), label_names=None)
+    else:
+        model = mx.mod.Module(symbol=sym, context=mx.cpu(), label_names=None)
     model.bind(data_shapes=[('data', (1, 3, image_size[0], image_size[1]))])
     model.set_params(arg_params, aux_params)
 
@@ -118,8 +121,8 @@ def main(args, scale_candidate):
     """
     ## Default arguments
     use_cuda = torch.cuda.is_available()
-    torch.backends.cudnn.benchmark = True
-    torch.cuda.synchronize()
+    # torch.backends.cudnn.benchmark = True
+    # torch.cuda.synchronize()
     gpu_device = torch.device('cuda')
     cpu_device = torch.device('cpu')
     
@@ -149,7 +152,7 @@ def main(args, scale_candidate):
 
     ## Load the pytorch classifier model
     embedding_classifier_model = embedding_classifier(input_embeddings.shape[1], num_classes=num_classes)
-    embedding_classifier_model.load_state_dict(torch.load(args['classifier_path']))
+    embedding_classifier_model.load_state_dict(torch.load(args['classifier_path'],  map_location=cpu_device))
     # if use_cuda:
     #     embedding_classifier_model.cuda()
     embedding_classifier_model.eval()
@@ -210,7 +213,7 @@ def main(args, scale_candidate):
                     ## image warping
                     warped_img = face_preprocess.preprocess(frame, bbox=box, landmark=each_landmark, image_size=args['image_size_for_align'])
 
-                    cv2.imshow('warped_img', warped_img)
+                    # cv2.imshow('warped_img', warped_img)
 
                     warped_img = cv2.cvtColor(warped_img, cv2.COLOR_BGR2RGB)
                     warped_img = np.transpose(warped_img, (2,0,1))
@@ -309,7 +312,7 @@ if __name__ == "__main__":
     parser.add_argument("--resize_width", default=480, type=int, help="resize width.")
     parser.add_argument("--resize_height", default=360, type=int, help="resize width.")
     parser.add_argument("--frame_flip", default=False, type=str2bool, help="Flip frame or not.")
-    parser.add_argument("--gpu_id", default=0, type=int, help="GPU ID.")
+    parser.add_argument("--gpu_id", default='cpu', help="GPU ID.")
     parser.add_argument('--image_size_for_align', default='112,112', type=str, help="image size for crop.")
     parser.add_argument('--det_threshold', default=0.8, type=float, help="detection threshold.")
     parser.add_argument('--frame_num_for_detection', default=15, type=int)

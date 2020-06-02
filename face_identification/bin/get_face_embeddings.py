@@ -88,14 +88,14 @@ if __name__ == "__main__":
     
     ## Argumetns for data
     parser.add_argument("--dataset_path", default="/home/gbkim/gb_dev/insightface_MXNet/insightface/face_identification/face_bank")
-    parser.add_argument("--save_path_", default="/home/gbkim/gb_dev/insightface_MXNet/insightface/face_identification/face_bank/embeddings_info2.pickle")
+    parser.add_argument("--save_path_", default="/home/gbkim/gb_dev/insightface_MXNet/insightface/face_identification/face_bank/embeddings_info_MobileFaceNet_model-y1-test2.pickle")
 
     ## Arguments for RetinaFace
     parser.add_argument('--gpu_id', default=0, type=int, help="GPU ID.")
     parser.add_argument('--image_size_for_align', default='112,112', type=str, help="image size for crop.")
-    parser.add_argument('--face_detect_model_path', default='/home/gbkim/gb_dev/insightface_MXNet/insightface/face_identification/model/retinaface-R50/R50', type=str, help='path of the face detection model.')
+    parser.add_argument('--face_detect_model_path', default='/home/gbkim/gb_dev/insightface_MXNet/insightface/face_identification/model/face_detector/retinaface-R50/R50', type=str, help='path of the face detection model.')
     parser.add_argument('--detector_epoch', default=0, type=int, help='epoch of the detector.')
-    parser.add_argument('--embedding_model_path', default='/home/gbkim/gb_dev/insightface_MXNet/insightface/face_identification/model/MobileFaceNet_model-y1-test2/model', type=str, help='path of the model extracing embeddings.')
+    parser.add_argument('--embedding_model_path', default='/home/gbkim/gb_dev/insightface_MXNet/insightface/face_identification/model/face_embedding_extractor/MobileFaceNet_model-y1-test2/model', type=str, help='path of the model extracing embeddings.')
     parser.add_argument('--embedding_epoch', default=0, type=int, help='epoch of the embedding model.')
     parser.add_argument('--det_threshold', default=0.8, type=float, help="detection threshold.")
     parser.add_argument('--frame_flip', default=False, type=str2bool, help='Flip frame or not.')
