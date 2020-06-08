@@ -1,6 +1,10 @@
 import numpy as np
 import torch
 use_cuda = torch.cuda.is_available()
+cuda0 = torch.device("cuda:0")
+cuda1 = torch.device('cuda:1')
+cuda2 = torch.device('cuda:2')
+
 import torch.nn as nn
 import torch.optim as optim
 import torch.nn.functional as F
@@ -41,15 +45,14 @@ class embedding_classifier(nn.Module):
         )
 
         if use_cuda:
-            self.fc_module = self.fc_module.cuda()
+            self.fc_module = self.fc_module.to(cuda0)
 
     def forward(self, input_data):
-        input_data = torch.tensor(input_data)
-        if use_cuda:
-            input_data = input_data.cuda()
+        input_data = torch.tensor(input_data, device=cuda0)
+        # if use_cuda:
+        #     input_data = input_data
         out = self.fc_module(input_data)
         
-        return out.cuda()
-
+        return out.to(cuda0)
 
 

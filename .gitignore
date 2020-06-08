@@ -4,7 +4,10 @@ models/
 RetinaFaceAntiCov/model/
 RetinaFace/model/
 face_identification/model/
-face_identification/mtcnn-model
+face_identification/face_bank/
+face_identification/mtcnn-model/
+face_identification_for_cpu/model/
+face_identification_for_cpu/mtcnn-model
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
@@ -107,4 +110,3 @@ ENV/
 
 # mypy
 .mypy_cache/
-

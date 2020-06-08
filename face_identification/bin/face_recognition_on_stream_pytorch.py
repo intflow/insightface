@@ -3,10 +3,11 @@ sys.path.append(os.path.abspath(os.path.dirname(__file__)))
 sys.path.append(os.path.dirname(os.path.abspath(os.path.dirname(__file__))))
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(os.path.dirname(__file__))), 'utils'))
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(os.path.dirname(__file__))), 'architecture'))
-
+# os.environ["CUDA_VISIBLE_DEVICES"] = '0, 1, 2, 3'
 import cv2
 import time
 import dlib
+import rtsp
 import torch
 import torchsummary
 import pickle
@@ -21,6 +22,10 @@ from imutils.video import VideoStream
 from architecture.retinaface import RetinaFace
 from utils.face_detection_and_align import AnalyzeFace
 from architecture.embedding_learner_pytorch import embedding_classifier
+
+cuda0 = torch.device("cuda:0")
+cuda1 = torch.device('cuda:1')
+cuda2 = torch.device('cuda:2')
 
 
 def str2bool(v):
@@ -119,7 +124,7 @@ def main(args, scale_candidate):
     ## Default arguments
     use_cuda = torch.cuda.is_available()
     torch.backends.cudnn.benchmark = True
-    torch.cuda.synchronize()
+    torch.cuda.synchronize(device=args['gpu_id'])
     gpu_device = torch.device('cuda')
     cpu_device = torch.device('cpu')
     
@@ -139,29 +144,34 @@ def main(args, scale_candidate):
 
     ## Load face detector
     face_detector = RetinaFace(prefix=args['face_detect_model_path'], epoch=args['detector_epoch'], ctx_id=args['gpu_id'], network='net3')
+    # face_detector = RetinaFace(prefix=args['face_detect_model_path'], epoch=args['detector_epoch'], ctx_id=0, network='net3')
     print("[INFO] RetinaFace has been loaded as a face_detector...")
 
 
     ## Load embedding extractor
     embedding_model = load_embedding_model(model_str=args['embedding_model_path'], epoch=args['embedding_epoch'], ctx=args['gpu_id'], image_size_for_align=args['image_size_for_align'], layer='fc1')
+    # embedding_model = load_embedding_model(model_str=args['embedding_model_path'], epoch=args['embedding_epoch'], ctx=1, image_size_for_align=args['image_size_for_align'], layer='fc1')
     print("[INFO] embedding model has been loaded as a embedding extractor...")
 
 
     ## Load the pytorch classifier model
     embedding_classifier_model = embedding_classifier(input_embeddings.shape[1], num_classes=num_classes)
     embedding_classifier_model.load_state_dict(torch.load(args['classifier_path']))
-    # if use_cuda:
-    #     embedding_classifier_model.cuda()
     embedding_classifier_model.eval()
     torchsummary.summary(embedding_classifier_model, (input_embeddings.shape[1], ))## show summary of model
     print("[INFO] pytorch embedding classifier model has been loaded...")
 
 
     ## Capture video streaming
-    vs = VideoStream(src=args['source']).start()
+    # vs = VideoStream(src=args['source']).start()
     # vs = cv2.VideoCapture(args['source'])
-    frame = vs.read()
-    # ret, frame = vs.read()    
+    # frame = vs.read()
+    # ret, frame = vs.read()
+    vs = rtsp.Client(rtsp_server_uri=args['source'])
+    while True:
+        frame = vs.read(raw=True)
+        if frame is not None:
+            break    
     frame = imutils.resize(frame, width=args["resize_width"])
     # print(f"[INFO] frame size: ({frame.shape[0]},{frame.shape[1]})")
 
@@ -181,16 +191,18 @@ def main(args, scale_candidate):
     print(f"[INFO] image scale: {im_scale}")
     scales = [im_scale]
 
+    ## main loop to get rtsp frame and recognition
     while True:
-        # vs.grabs()
+        frame = vs.read(raw=True)
         frames += 1 #count current frame number
-        frame = vs.read()
+        # frame = vs.read()
         # frame = torch.Tensor(frame)
         # ret, frame = vs.read()
         frame = imutils.resize(frame, width=args["resize_width"])
         rgb_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
         print('[INFO] Pre-size of Frame: ', frame.shape)
         
+        torch.cuda.synchronize(device=args['gpu_id'])
         currTime = time.time()
 
         if int(frames % args['frame_num_for_detection']) == 0:
@@ -216,13 +228,15 @@ def main(args, scale_candidate):
                     warped_img = np.transpose(warped_img, (2,0,1))
                     
                     ## extract embedings
-                    extrated_embedding = get_feature(embedding_model=embedding_model, aligned_img=warped_img)
-                    extrated_embedding = extrated_embedding.reshape(1, -1)
+                    extracted_embedding = get_feature(embedding_model=embedding_model, aligned_img=warped_img)
+                    extracted_embedding = extracted_embedding.reshape(1, -1)
 
                     ## Predcit class
-                    preds = embedding_classifier_model(extrated_embedding)
+                    preds = embedding_classifier_model(extracted_embedding)
+                    torch.cuda.synchronize(device=args['gpu_id'])
                     # preds = embedding_classifier.predict(extrated_embedding)
                     preds = preds.flatten()
+                    # torch.cuda.synchronize(device=args['gpu_id'])
 
                     ## Get the highest accuracy embedded vector
                     # candidate_index = np.argmax(preds.detach().cpu().clone())
@@ -235,7 +249,7 @@ def main(args, scale_candidate):
                     selected_idx = np.random.choice(match_class_idx, comparing_num)
                     compare_embeddings = input_embeddings[selected_idx]
                     # Calculate cosine similarity
-                    cos_similarity = CosineSimilarity(extrated_embedding, compare_embeddings)
+                    cos_similarity = CosineSimilarity(extracted_embedding, compare_embeddings)
 
                     text = 'Unknown'
 
@@ -312,7 +326,7 @@ if __name__ == "__main__":
     parser.add_argument("--gpu_id", default=0, type=int, help="GPU ID.")
     parser.add_argument('--image_size_for_align', default='112,112', type=str, help="image size for crop.")
     parser.add_argument('--det_threshold', default=0.8, type=float, help="detection threshold.")
-    parser.add_argument('--frame_num_for_detection', default=15, type=int)
+    parser.add_argument('--frame_num_for_detection', default=5, type=int)
     parser.add_argument('--proba_threshold', default=0.6)
     parser.add_argument('--cosine_threshold', default=0.6)
 

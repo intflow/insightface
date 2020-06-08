@@ -7,6 +7,7 @@ sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(os.path.dirname(
 import cv2
 import time
 import dlib
+import rtsp
 import torch
 import torchsummary
 import pickle
@@ -161,9 +162,15 @@ def main(args, scale_candidate):
 
 
     ## Capture video streaming
-    vs = VideoStream(src=args['source']).start()
+    # vs = VideoStream(src=args['source']).start()
+    vs = rtsp.Client(rtsp_server_uri=args['source'])
     # vs = cv2.VideoCapture(args['source'])
-    frame = vs.read()
+    # frame = vs.read()
+    while True:
+        frame = vs.read(raw=True)
+        if frame is not None:
+            break
+    # if frame is not None:
     # ret, frame = vs.read()    
     frame = imutils.resize(frame, width=args["resize_width"])
     # print(f"[INFO] frame size: ({frame.shape[0]},{frame.shape[1]})")
@@ -185,13 +192,15 @@ def main(args, scale_candidate):
     scales = [im_scale]
 
     while True:
+        frame = vs.read(raw=True)
         # vs.grabs()
         frames += 1 #count current frame number
-        frame = vs.read()
+        # frame = vs.read()
         # frame = torch.Tensor(frame)
         # ret, frame = vs.read()
         frame = imutils.resize(frame, width=args["resize_width"])
-        rgb_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+        frame_copy = frame.copy()
+        # rgb_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
         print('[INFO] Pre-size of Frame: ', frame.shape)
         
         currTime = time.time()
@@ -213,7 +222,7 @@ def main(args, scale_candidate):
                     ## image warping
                     warped_img = face_preprocess.preprocess(frame, bbox=box, landmark=each_landmark, image_size=args['image_size_for_align'])
 
-                    # cv2.imshow('warped_img', warped_img)
+                    cv2.imshow('warped_img', warped_img)
 
                     warped_img = cv2.cvtColor(warped_img, cv2.COLOR_BGR2RGB)
                     warped_img = np.transpose(warped_img, (2,0,1))
@@ -250,7 +259,8 @@ def main(args, scale_candidate):
                     # Start tracking
                     tracker = dlib.correlation_tracker()
                     rect = dlib.rectangle(box[0], box[1], box[2], box[3])
-                    tracker.start_track(rgb_frame, rect)
+                    # tracker.start_track(frame_copy, rect)
+                    tracker.start_track(frame, rect)
                     trackers.append(tracker)
                     texts.append(text)
 
@@ -295,7 +305,7 @@ def main(args, scale_candidate):
         if (cv2.waitKey(1) & 0xFF) == ord("q"):
             break
 
-    vs.stream.release()
+    # vs.stream.release()
     cv2.destroyAllWindows()
 
 
@@ -312,17 +322,18 @@ if __name__ == "__main__":
     parser.add_argument("--resize_width", default=480, type=int, help="resize width.")
     parser.add_argument("--resize_height", default=360, type=int, help="resize width.")
     parser.add_argument("--frame_flip", default=False, type=str2bool, help="Flip frame or not.")
-    parser.add_argument("--gpu_id", default='cpu', help="GPU ID.")
+    parser.add_argument("--gpu_id", default='cpu', help="GPU ID or CPU")
     parser.add_argument('--image_size_for_align', default='112,112', type=str, help="image size for crop.")
     parser.add_argument('--det_threshold', default=0.8, type=float, help="detection threshold.")
-    parser.add_argument('--frame_num_for_detection', default=15, type=int)
+    parser.add_argument('--frame_num_for_detection', default=10, type=int)
     parser.add_argument('--proba_threshold', default=0.6)
     parser.add_argument('--cosine_threshold', default=0.6)
 
     args = vars(parser.parse_args())
 
     #adjustable variables
-    scale_candidate = [240, 480]
+    # scale_candidate = [240, 480]
+    scale_candidate = [120, 240]
 
     #Do detection and embedding comparison.
     main(args, scale_candidate)

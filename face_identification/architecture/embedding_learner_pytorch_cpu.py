@@ -2,6 +2,7 @@ import numpy as np
 import torch
 use_cuda = torch.cuda.is_available()
 cpu_device = torch.device('cpu')
+gpu_device = torch.device('gpu')
 import torch.nn as nn
 import torch.optim as optim
 import torch.nn.functional as F
@@ -43,14 +44,14 @@ class embedding_classifier(nn.Module):
 
         # if use_cuda:
         #     self.fc_module = self.fc_module.cuda()
-        self.fc_module = self.fc_module.to(cpu_device)
+        self.fc_module = self.fc_module.to(gpu_device)
 
     def forward(self, input_data):
         # input_data = torch.tensor(input_data).to(cpu_device)
         # input_data.clone().detach()
         # if use_cuda:
         #     input_data = input_data.cuda()
-        input_data = torch.tensor(input_data, device=cpu_device)
+        input_data = torch.tensor(input_data, device=gpu_device)
         out = self.fc_module(input_data)
         
         return out.cuda()
