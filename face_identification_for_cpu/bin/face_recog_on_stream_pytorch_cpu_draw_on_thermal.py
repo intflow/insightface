@@ -434,7 +434,7 @@ def main(args, scale_candidate):
         print("[INFO] approx. current FPS: {:.2f}".format(fps))
         cv2.putText(normal_frame, fps_str_format, (0, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
 
-        cv2.imshow("Normal Frame", normal_frame)
+        # cv2.imshow("Normal Frame", normal_frame)
         cv2.imshow("Thermal Frame", thermal_frame)
 
         if (cv2.waitKey(1) & 0xFF) == ord("q"):
@@ -461,7 +461,7 @@ if __name__ == "__main__":
     parser.add_argument("--gpu_id", default='cpu', help="GPU ID or CPU")
     parser.add_argument('--image_size_for_align', default='112,112', type=str, help="image size for crop.")
     parser.add_argument('--det_threshold', default=0.8, type=float, help="detection threshold.")
-    parser.add_argument('--frame_num_for_detection', default=5, type=int)
+    parser.add_argument('--frame_num_for_detection', default=2, type=int)
     parser.add_argument('--proba_threshold', default=0.6)
     parser.add_argument('--cosine_threshold', default=0.6)
 

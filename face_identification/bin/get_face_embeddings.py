@@ -1,3 +1,4 @@
+#-*- coding:utf-8 -*-
 """
 *Initial writer : GBKim
 *Date           : 29.May.2020
@@ -60,6 +61,7 @@ def main(args, scale_candidate):
 
     for (i, each_img_path) in enumerate(imagePaths):
         name = each_img_path.split(os.path.sep)[-2]
+        # name = str(name, 'utf-8')
         print("[INFO] processing on {0}-th/{1}. The name of the image is: {2}".format(i+1, len(imagePaths), name))
 
         #Load image
