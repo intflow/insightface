@@ -1,3 +1,5 @@
+# **INTFLOW will deprecated this repository.**
+
 
 # InsightFace: 2D and 3D Face Analysis Project
 
@@ -9,6 +11,7 @@ originated By Jia Guo and [Jiankang Deng](https://jiankangdeng.github.io/)
 
 ## Notice
 This code is edited by IntFlow, Co., Ltd.
+
 
 ## What is done now
 1. \[완료\]마스크 착용 여부 체크 모델의 RTSP Frame Detection

@@ -19,7 +19,7 @@ import pickle
 import argparse
 import numpy as np
 from imutils import paths
-from utils.face_detection_and_align import AnalyzeFace
+from ..utils.face_detection_and_align import AnalyzeFace
 
 
 def str2bool(v):

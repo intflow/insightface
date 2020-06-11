@@ -8,19 +8,21 @@
     - GBKim 05.25.2020: Initial coding.
 """
 
+import os
 import cv2
 import sys
-import numpy as np
-import datetime
-import os
+import rtsp
 import glob
 import time
-import argparse
 import imutils
+import argparse
+import datetime
+import numpy as np
 from imutils.video import VideoStream
 from imutils.video import WebcamVideoStream
 from imutils.video import FPS
 from retinaface_cov import RetinaFaceCoV
+
 
 def str2bool(v):
     if isinstance(v, bool):
@@ -32,33 +34,25 @@ def str2bool(v):
     else:
         raise argparse.ArgumentTypeError('Boolean value expected.')
 
-if __name__ == '__main__':
-    ## Parse arguments
-    parser = argparse.ArgumentParser(description="argparser for mask_face_detection.")
 
-    parser.add_argument("-S", "--source", default="rtsp://admin:kmjeon3121@192.168.0.108:554/cam/realmonitor?channel=1&subtype=0", type=str, help="Path to the rtsp address of webcam or the path of the video.")
-    parser.add_argument("-MP", "--model_path", default="./model/mnet_cov2")
-    parser.add_argument("-TH", "--threshold", default=0.8, type=float, help="")
-    parser.add_argument("-MTH", "--mask_thresh", default=0.2, type=float, help="")
-    parser.add_argument("--epoch", default=0, type=int, help="model's epoch.")
-    parser.add_argument("--gpu_id", default=0, type=int, help="GPU ID.")
-    parser.add_argument("--frame_width", default=480, type=int, help="resize width.")
-    parser.add_argument("--frame_height", default=270, type=int, help="resize width.")
-    parser.add_argument("--frame_flip", default=False, type=str2bool, help="Flip frame or not.")
-    args = vars(parser.parse_args())
-
+def main(args):
     ## Default variables
-    scales = [270, 480] # [640, 960]
+    scales = [240, 480] # [640, 960]
     target_size = scales[0] #640
     max_size = scales[1] #1080
     count = 2
 
-    ## Load model 
+    ## Load model
     detector = RetinaFaceCoV(prefix=args['model_path'], epoch=args['epoch'], ctx_id=args['gpu_id'], network='net3l')
 
     ## Capture RTSP video
-    vs = VideoStream(src=args['source']).start()
-    frame = vs.read()
+    vs = rtsp.Client(rtsp_server_uri=args['source'])
+    while True:
+        frame = vs.read(raw=True)
+        if frame is not None:
+            break
+
+    # vs = VideoStream(src=args['source']).start()
     frame = imutils.resize(frame, width=args["frame_width"], height=args["frame_height"])
     print(f"[INFO] frame size: ({frame.shape[0]},{frame.shape[1]})")
 
@@ -76,8 +70,8 @@ if __name__ == '__main__':
 
     ## Display Frame
     while True:
-        frame = vs.read()
-        frame = imutils.resize(frame, width=args["frame_width"], height=args["frame_height"])
+        frame = vs.read(raw=True)
+        frame = imutils.resize(frame, width=args["frame_width"])
 
         curTime = time.time() # For FPS
 
@@ -94,9 +88,9 @@ if __name__ == '__main__':
                 print(i, box, mask)
 
                 if mask >= args["mask_thresh"]:
-                    color = (0,0,255)
-                else:
                     color = (0,255,0)
+                else:
+                    color = (0,0,255)
                 cv2.rectangle(frame, (box[0], box[1]), (box[2], box[3]), color, 5)
                 landmark5 = landmarks[i].astype(np.int)
 
@@ -123,10 +117,24 @@ if __name__ == '__main__':
 
     cv2.destroyAllWindows()
 
-        
 
-        
 
+if __name__ == '__main__':
+    ## Parse arguments
+    parser = argparse.ArgumentParser(description="argparser for mask_face_detection.")
+
+    parser.add_argument("-S", "--source", default="rtsp://admin:kmjeon3121@192.168.0.108:554/cam/realmonitor?channel=1&subtype=0", type=str, help="Path to the rtsp address of webcam or the path of the video.")
+    parser.add_argument("-MP", "--model_path", default="/home/gbkim/gb_dev/insightface_MXNet/insightface/RetinaFaceAntiCov/model/mnet_cov2")
+    parser.add_argument("--epoch", default=0, type=int, help="model's epoch.")
+    parser.add_argument("-TH", "--threshold", default=0.6, type=float, help="")
+    parser.add_argument("-MTH", "--mask_thresh", default=0.4, type=float, help="")
+    parser.add_argument("--gpu_id", default=0, type=int, help="GPU ID.")
+    parser.add_argument("--frame_width", default=480, type=int, help="resize width.")
+    parser.add_argument("--frame_height", default=360, type=int, help="resize width.")
+    parser.add_argument("--frame_flip", default=False, type=str2bool, help="Flip frame or not.")
+    args = vars(parser.parse_args())
+
+    main(args)
 
 
 
